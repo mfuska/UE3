@@ -10,7 +10,6 @@ import java.util.logging.Logger;
  */
 public class ClientReadInputThread extends Thread {
 
-    private String name;
     private ResultSetter setter;
     private Logger logger;
     public ClientReadInputThread(Logger logger) {
@@ -24,10 +23,14 @@ public class ClientReadInputThread extends Thread {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter your name:");
         try {
-            logger.info(this.getName() + ": bevor readLine()");
-            this.name = br.readLine();
-            logger.info(this.getName() + ": after readLine()");
-            setter.setResult(this.name);
+            logger.info("read name");
+            String name = br.readLine();
+            logger.info("read command");
+            System.out.println("Commands:");
+            System.out.println("\tStart Chat = 1");
+            System.out.println("\tWait for Chat = 2");
+            String cmd = br.readLine();
+            setter.setResult(name,cmd);
             logger.info(this.getName() + "run done");
         } catch (IOException e) {
             e.printStackTrace();

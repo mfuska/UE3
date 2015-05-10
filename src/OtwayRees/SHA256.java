@@ -13,14 +13,14 @@ public class SHA256 {
 
     public SHA256() {
     }
-    protected byte[] calculateHash(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    public byte[] calculateHash(String str) throws NoSuchAlgorithmException, UnsupportedEncodingException {
         MessageDigest dig = null;
         dig = MessageDigest.getInstance(this.SHA);
         dig.reset();
         dig.update(str.getBytes("UTF-8"));
         return dig.digest();
     }
-    protected String hex2String(byte[] hashValue) {
+    public String hex2String(byte[] hashValue) {
         StringBuffer hexString = new StringBuffer();
 
         if (debug) System.out.println("hashlength:" + hashValue.length );

@@ -31,7 +31,7 @@ public class Client {
     }
     private static void readUserName() {
         ResultSetter setter = new ResultSetter() {
-            public void setResult(String name) {
+            public void setResult(String name, String cmd) {
                 clientName = name;
             }
         };
@@ -40,11 +40,11 @@ public class Client {
 
         threadRead.setResultSetter(setter);
         threadRead.start();
-        try {
+        /*try {
             threadRead.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
     }
     private static void startUserCommunicationSocket() {
          ClientCommunicationThread ccThread = new ClientCommunicationThread(logger, aseObj);

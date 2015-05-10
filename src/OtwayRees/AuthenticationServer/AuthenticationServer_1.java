@@ -41,7 +41,7 @@ public class AuthenticationServer_1 {
             sha = new OtwayRees.SHA256();
             rsa = new RSA(n,e);
             rsa.setPrivateKey(d);
-            logger.info("AUTH-SERVER: started AiuthenticationServer");
+            logger.info("AUTH-SERVER: started AuthenticationServer");
         } catch (IOException e) {
             e.getStackTrace();
         }
@@ -55,6 +55,7 @@ public class AuthenticationServer_1 {
                 Socket s_incoming = s_Socket.accept();
                 Runnable r = new AuthServerThread(s_incoming, logger, sha, rsa,db);
                 Thread t = new Thread(r);
+                t.setName("AuthServerThread");
                 t.start();
             }
         } catch (IOException e) {
@@ -80,12 +81,12 @@ class AuthServerThread implements Runnable {
     }
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        logger.info("AUTH-SERVER-THREAD: returnPrivatKey");
+        logger.info("returnPrivatKey");
 
         return this.db.get(this.sha.hex2String(this.sha.calculateHash(key)));
     }
     public void run() {
-        logger.info("AUTH-SERVER-THREAD: run");
+        logger.info("run");
         try {
             System.out.println(rsa.decrypt(retunPrivateKey("daniel")));
             System.out.println(rsa.decrypt(retunPrivateKey("carina")));
