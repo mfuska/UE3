@@ -1,4 +1,5 @@
-package OtwayRees;
+package OtwayRees.AuthenticationServer;
+
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -10,7 +11,7 @@ import java.security.SecureRandom;
  */
 public class generateKeyDB {
     private static OtwayRees.SHA256 sha;
-    private static OtwayRees.RSA rsa;
+    private static RSA rsa;
     private static SecureRandom random = new SecureRandom();
     private static int BITLENGTH = 2048;
 
@@ -18,7 +19,7 @@ public class generateKeyDB {
     public static void main(String[] args) {
         try {
             sha = new OtwayRees.SHA256();
-            rsa = new OtwayRees.RSA();
+            rsa = new RSA();
             BigInteger number = new BigInteger(BITLENGTH, random);
             BigInteger number1 = new BigInteger(BITLENGTH, random);
             BigInteger number2 = new BigInteger(BITLENGTH, random);

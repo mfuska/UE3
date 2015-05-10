@@ -1,4 +1,5 @@
-package OtwayRees;
+package OtwayRees.AuthenticationServer;
+
 
 import java.io.*;
 import java.math.BigInteger;

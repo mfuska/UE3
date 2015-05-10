@@ -1,4 +1,4 @@
-package OtwayRees;
+package OtwayRees.AuthenticationServer;
 /*
  * Created by mike on 01.05.15.
  */
