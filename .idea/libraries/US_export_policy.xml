@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="US_export_policy">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/US_export_policy.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
