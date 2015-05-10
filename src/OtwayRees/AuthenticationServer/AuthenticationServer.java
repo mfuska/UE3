@@ -27,36 +27,34 @@ public class AuthenticationServer {
 
     private static final int PORT = 5013;
 
-    public AuthenticationServer() {
+    private static void init() {
         try {
             logObj = OtwayRees.myLogger.getInstance();
             logger = logObj.getLogger();
-            logger.info("try to start AuthenticationServer");
-            logger.info("read db file: /Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
+            logger.info("AUTH-SERVER: try to start AuthenticationServer");
+            logger.info("AUTH_SERVER: read db file: /Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
             OtwayRees.readFile file = new OtwayRees.readFile("/Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
             db = file.generateDB();
-            logger.info("init DB finished");
+            logger.info("AUTH-SERVER: init DB finished");
             sha = new OtwayRees.SHA256();
             rsa = new OtwayRees.RSA(n,e);
             rsa.setPrivateKey(d);
-            logger.info("started AiuthenticationServer");
+            logger.info("AUTH-SERVER: started AiuthenticationServer");
         } catch (IOException e) {
             e.getStackTrace();
         }
     }
 
     public static void main(String[] args) {
-        AuthenticationServer authServ = new AuthenticationServer();
+        init();
         try {
             ServerSocket s_Socket = new ServerSocket(AuthenticationServer.PORT);
 
-            int i = 1;
             while (true) {
                 Socket s_incoming = s_Socket.accept();
-                Runnable r = new AuthServerThread(s_incoming, i, logger, sha, rsa,db);
+                Runnable r = new AuthServerThread(s_incoming, logger, sha, rsa,db);
                 Thread t = new Thread(r);
                 t.start();
-                i++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -66,17 +64,14 @@ public class AuthenticationServer {
 
 class AuthServerThread implements Runnable {
     private Socket socket;
-    private int anzahlClient;
 
     private Logger logger;
     private HashMap<String, BigInteger> db;
     private OtwayRees.SHA256 sha;
-    private OtwayRees.myLogger logObj;
     private OtwayRees.RSA rsa;
 
-    public AuthServerThread(Socket s, int i, Logger logger, OtwayRees.SHA256 sha, OtwayRees.RSA rsa, HashMap<String, BigInteger> db) {
+    public AuthServerThread(Socket s, Logger logger, OtwayRees.SHA256 sha, OtwayRees.RSA rsa, HashMap<String, BigInteger> db) {
         this.socket = s;
-        this.anzahlClient = i;
         this.rsa = rsa;
         this.logger = logger;
         this.sha = sha;
@@ -84,9 +79,12 @@ class AuthServerThread implements Runnable {
     }
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        logger.info("AUTH-SERVER-THREAD: returnPrivatKey");
+
         return this.db.get(this.sha.hex2String(this.sha.calculateHash(key)));
     }
     public void run() {
+        logger.info("AUTH-SERVER-THREAD: run");
         try {
             System.out.println(rsa.decrypt(retunPrivateKey("daniel")));
             System.out.println(rsa.decrypt(retunPrivateKey("carina")));
