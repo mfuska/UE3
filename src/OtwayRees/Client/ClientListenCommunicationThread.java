@@ -22,6 +22,7 @@ public class ClientListenCommunicationThread extends Thread {
     private static int MIN = 10000000;
     private int R2;
     private Random rand;
+    private Message authMessage;
 
     public ClientListenCommunicationThread(Logger logger, ASE_1 aseObj, int port) {
         this.port = port;
@@ -32,6 +33,24 @@ public class ClientListenCommunicationThread extends Thread {
         this.R2 =  rand.nextInt((MAX - MIN) + 1) + MIN;
     }
 
+    private void startAuthServerCommunication(Message messageObj) {
+        ResultAuthServerSetter setter = new ResultAuthServerSetter() {
+            public void setResultSetter(Message authMsg) {
+                authMessage = authMsg;
+            }
+        };
+
+        ClientAuthServerCommunicationThread threadAuth = new ClientAuthServerCommunicationThread(logger, messageObj);
+        threadAuth.setName("ClientAuthServerCommunicationThread");
+
+        threadAuth.setResultSetter(setter);
+        threadAuth.start();
+        try {
+            threadAuth.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     public void run() {
         try {
             logger.info("try to open the Socket");
@@ -50,9 +69,11 @@ public class ClientListenCommunicationThread extends Thread {
 
             this.R2 =  this.rand.nextInt((MAX - MIN) + 1) + MIN;
             String str = new String(strR2 + msgID + msg_Input.getUserNameA() + msg_Input.getUserNameB());
+
+            // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             msg_Input.setkB(aseObj.Encrypt(str));
             System.out.println(this.getName() + "bevor write to Auth Server:" + str + " kA:" + msg_Input.getKA() + " kB:" + msg_Input.getKB());
-
+            startAuthServerCommunication(msg_Input);
             //WRITE TO AUTH SERVER
             //oos.writeObject(msg_Input);
 

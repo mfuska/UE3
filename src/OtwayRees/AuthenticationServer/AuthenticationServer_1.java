@@ -1,8 +1,12 @@
 package OtwayRees.AuthenticationServer;
 
+import OtwayRees.ASE_1;
+import OtwayRees.Message;
 import OtwayRees.SHA256;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
@@ -53,6 +57,7 @@ public class AuthenticationServer_1 {
 
             while (true) {
                 Socket s_incoming = s_Socket.accept();
+
                 Runnable r = new AuthServerThread(s_incoming, logger, sha, rsa,db);
                 Thread t = new Thread(r);
                 t.setName("AuthServerThread");
@@ -88,14 +93,25 @@ class AuthServerThread implements Runnable {
     public void run() {
         logger.info("run");
         try {
-            System.out.println(rsa.decrypt(retunPrivateKey("daniel")));
-            System.out.println(rsa.decrypt(retunPrivateKey("carina")));
-            System.out.println(rsa.decrypt(retunPrivateKey("michi")));
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+
+            Message msgObj = (Message)ois.readObject();
+            System.out.println("msgID" + msgObj.getMsgID() + " userA:" + msgObj.getUserNameA() + " userB:" + msgObj.getUserNameB());
+
+            ASE_1 aseUserA = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
+            ASE_1 aseUserB = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
+
+            System.out.println(aseUserA.Decrypt(msgObj.getKA()));
+            System.out.println(aseUserB.Decrypt(msgObj.getKB()));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
-
