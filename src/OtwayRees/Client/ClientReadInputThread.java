@@ -25,12 +25,19 @@ public class ClientReadInputThread extends Thread {
         try {
             logger.info("read name");
             String name = br.readLine();
+
             logger.info("read command");
-            System.out.println("Commands:");
             System.out.println("\tStart Chat = 1");
             System.out.println("\tWait for Chat = 2");
+            System.out.print("Commands:");
             String cmd = br.readLine();
-            setter.setResult(name,cmd);
+            if (cmd.equals("1")) {
+                System.out.print("\tEnter the name of your Chat partner:");
+                String nameB = br.readLine();
+                setter.setResult(name,nameB);
+            } else {
+                setter.setResult(name);
+            }
             logger.info(this.getName() + "run done");
         } catch (IOException e) {
             e.printStackTrace();
