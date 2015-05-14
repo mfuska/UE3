@@ -55,12 +55,8 @@ public class ClientConnectionCommunikationThread extends Thread {
 
             // C P1 P2 K1{R1 C P1 P2}
             String str = strR1 + msgID + msg_write.getUserNameA() + msg_write.getUserNameB();
-            System.out.println(this.getName() + " write:" + str);
             this.msg_write.setkA(ase.Encrypt(str));
-            System.out.println("DecryptMSG:" + ase.Decrypt(this.msg_write.getKA()));
-            System.out.println(this.getName() + " write:" + str + " kA:" + msg_write.getKA());
             this.oos.writeObject(msg_write);
-            System.out.println(this.getName() + " after write:" + str);
 
             Message authMessage = (Message) ois.readObject();
             if (this.msg_write.getMsgID() != authMessage.getMsgID()) {
@@ -75,8 +71,6 @@ public class ClientConnectionCommunikationThread extends Thread {
             ASE aseCommunication = new ASE(new BigInteger(R1KC.substring(9,R1KC.length())));
             String msg2Send = aseCommunication.Encrypt("TEST KC");
             oos.writeObject(msg2Send);
-
-            System.out.println("run CLIENT THREAD");
 
         } catch (IOException e) {
             e.printStackTrace();

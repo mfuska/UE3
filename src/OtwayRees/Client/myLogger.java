@@ -1,15 +1,16 @@
-package OtwayRees;
+package OtwayRees.Client;
 
+/*
+ * Created on 03.05.15.
+ */
 import java.io.IOException;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-/*
- * Created on 03.05.15.
- */
 public class myLogger {
-    private Logger logger = Logger.getLogger("OtwayRees");
+
+    private Logger logger = Logger.getLogger("OtwayRees.Client");
     private FileHandler fh;
     private int SIZE = 2048;
     private int ROTATIONCOUNT = 1;
@@ -17,7 +18,7 @@ public class myLogger {
     private static myLogger instance;
     private myLogger() {
         try {
-            fh = new FileHandler("/Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/OtwayRees.log",this.SIZE,this.ROTATIONCOUNT);
+            fh = new FileHandler("./src/OtwayRees/Client/OtwayReesClient.log", this.SIZE, this.ROTATIONCOUNT);
             logger.addHandler(fh);
             logger.setUseParentHandlers(false);
             SimpleFormatter formatter = new SimpleFormatter();
@@ -39,3 +40,4 @@ public class myLogger {
         return logger;
     }
 }
+

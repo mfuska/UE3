@@ -72,15 +72,10 @@ public class ClientListenCommunicationThread extends Thread {
             String strR2 = Integer.toString(this.R2);
 
             String str = strR2 + msgID + msg_Input.getUserNameA() + msg_Input.getUserNameB();
-            System.out.println("R2:" + R2 + " strR2:" + strR2);
-            System.out.println("str:" + str);
 
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             msg_Input.setkB(aseObj.Encrypt(str));
-            System.out.println("DecryptMSG:" + aseObj.Decrypt(msg_Input.getKB()));
-            System.out.println(this.getName() + "before write to Auth Server");
             startAuthServerCommunication(msg_Input);
-            System.out.println(this.getName() + "after write to Auth Server msgID:" + authMessage.getMsgID() + " kA:" + authMessage.getKA() + " kB:" + authMessage.getKB());
             //CHECK msgID == auth.msgID
             if (msg_Input.getMsgID() != authMessage.getMsgID()) {
                 throw new Exception("msgID ERROR: msg_Input.getMsgID() != authMessage.getMsgID() ");
@@ -98,7 +93,7 @@ public class ClientListenCommunicationThread extends Thread {
 
             String msgReceived = (String) ois.readObject();
             ASE aseCommunication = new ASE(new BigInteger(R2KC.substring(9,R2KC.length())));
-            System.out.println(aseCommunication.Decrypt(msgReceived));
+            System.out.println("Decrypt message:" + aseCommunication.Decrypt(msgReceived));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

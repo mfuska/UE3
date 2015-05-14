@@ -29,7 +29,7 @@ public class AuthenticationServer {
     private static BigInteger d = new BigInteger("21172262217534495471634887981071702875246911135321114362317317444199135576485995743140321385629581035521041020009033673730175993165652071724493971521566433417948732104092921224004169207344571671972826213750004053876926187313885686082384541322254299348083084372694839923079324508122835525142420596732896535118642519815835001993210034528244334536074373100429795492028598092715711589418466101867296242292170945305793366528590678636818718652408259997920316753385801513058072696999364111145817720650173858777644355231643555690036235437807806822774270225704189404159224338741079240815655459826420463019295163812707560281273");
     private static BigInteger e = new BigInteger("65537");
 
-    private static OtwayRees.myLogger logObj;
+    private static myLogger logObj;
     private static Logger logger;
 
     private static final int PORT = 50001;
@@ -39,7 +39,7 @@ public class AuthenticationServer {
 
     private static void init() {
         try {
-            logObj = OtwayRees.myLogger.getInstance();
+            logObj = myLogger.getInstance();
             logger = logObj.getLogger();
             logger.info("AUTH-SERVER: try to start AuthenticationServer");
             logger.info("AUTH_SERVER: read db file -> " + keyFile);
@@ -58,6 +58,7 @@ public class AuthenticationServer {
         init();
         try {
             s_Socket = new ServerSocket(PORT);
+            System.out.println("AUTH-SERVER: up and running");
 
             while (true) {
                 Socket s_incoming = s_Socket.accept();
