@@ -1,10 +1,7 @@
 <component name="libraryTable">
   <library name="local_policy">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/local_policy.jar!/" />
-    </CLASSES>
+    <CLASSES />
     <JAVADOC />
     <SOURCES />
-    <jarDirectory url="jar://$PROJECT_DIR$/lib/local_policy.jar!/" recursive="false" />
   </library>
 </component>
