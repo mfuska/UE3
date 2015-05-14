@@ -16,11 +16,11 @@ import java.security.spec.AlgorithmParameterSpec;
 /**
  * Created on 10.05.15.
  */
-public class ASE_1 {
+public class ASE {
     private Cipher cipherSend;
     private Cipher cipherReceive;
 
-    public ASE_1(BigInteger Key) {
+    public ASE(BigInteger Key) {
         byte[] KeyBytes = Key.toByteArray();
 
         try {

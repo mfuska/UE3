@@ -1,6 +1,6 @@
 package OtwayRees.AuthenticationServer;
 
-import OtwayRees.ASE_1;
+import OtwayRees.ASE;
 import OtwayRees.Message;
 import OtwayRees.SHA256;
 
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 /**
  * Created on 11.05.15.
  */
-public class AuthenticationServer_1 {
+public class AuthenticationServer {
 
     private static HashMap<String, BigInteger> db;
     private static SHA256 sha;
@@ -35,13 +35,15 @@ public class AuthenticationServer_1 {
     private static final int PORT = 50001;
     private static ServerSocket s_Socket;
 
+    private static final String keyFile = new String("/Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
+
     private static void init() {
         try {
             logObj = OtwayRees.myLogger.getInstance();
             logger = logObj.getLogger();
             logger.info("AUTH-SERVER: try to start AuthenticationServer");
-            logger.info("AUTH_SERVER: read db file: /Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
-            readFile file = new readFile("/Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
+            logger.info("AUTH_SERVER: read db file -> " + keyFile);
+            readFile file = new readFile(keyFile);
             db = file.generateDB();
             logger.info("AUTH-SERVER: init DB finished");
             sha = new OtwayRees.SHA256();
@@ -111,8 +113,8 @@ class AuthServerThread implements Runnable {
 
             Message msgObj = (Message)ois.readObject();
 
-            ASE_1 aseUserA = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
-            ASE_1 aseUserB = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
+            ASE aseUserA = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
+            ASE aseUserB = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
 
             Message msgSend = new Message(msgObj.getMsgID());
 

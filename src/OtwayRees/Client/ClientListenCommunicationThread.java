@@ -1,6 +1,6 @@
 package OtwayRees.Client;
 
-import OtwayRees.ASE_1;
+import OtwayRees.ASE;
 import OtwayRees.Message;
 
 import java.io.*;
@@ -20,14 +20,14 @@ public class ClientListenCommunicationThread extends Thread {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
     private Logger logger;
-    private OtwayRees.ASE_1 aseObj;
+    private ASE aseObj;
     private static int MAX = 99999999;
     private static int MIN = 10000000;
     private int R2;
     private Random rand;
     private Message authMessage;
 
-    public ClientListenCommunicationThread(Logger logger, ASE_1 aseObj, int port) {
+    public ClientListenCommunicationThread(Logger logger, ASE aseObj, int port) {
         this.port = port;
         this.logger = logger;
         this.aseObj = aseObj;
@@ -97,7 +97,7 @@ public class ClientListenCommunicationThread extends Thread {
             oos.writeObject(msg_Auth);
 
             String msgReceived = (String) ois.readObject();
-            ASE_1 aseCommunication = new ASE_1(new BigInteger(R2KC.substring(9,R2KC.length())));
+            ASE aseCommunication = new ASE(new BigInteger(R2KC.substring(9,R2KC.length())));
             System.out.println(aseCommunication.Decrypt(msgReceived));
         } catch (IOException e) {
             e.printStackTrace();

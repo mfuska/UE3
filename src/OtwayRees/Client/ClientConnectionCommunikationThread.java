@@ -1,6 +1,6 @@
 package OtwayRees.Client;
 
-import OtwayRees.ASE_1;
+import OtwayRees.ASE;
 import OtwayRees.Message;
 
 import java.io.IOException;
@@ -23,16 +23,16 @@ public class ClientConnectionCommunikationThread extends Thread {
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
     private Logger logger;
-    private ASE_1 aseObj;
+    private ASE aseObj;
     private Message msg_write;
-    private ASE_1 ase;
+    private ASE ase;
     private int R1;
     private Random rand;
 
     private static int MAX = 99999999;
     private static int MIN = 10000000;
 
-    public ClientConnectionCommunikationThread(Logger logger, ASE_1 aseObj, int port, Message msg, ASE_1 ase) {
+    public ClientConnectionCommunikationThread(Logger logger, ASE aseObj, int port, Message msg, ASE ase) {
         this.port = port;
         this.logger = logger;
         this.aseObj = aseObj;
@@ -72,7 +72,7 @@ public class ClientConnectionCommunikationThread extends Thread {
             if (!strR1.equals(R1_auth)) {
                 throw new Exception("R1 ERROR: R1 != R1_auth ");
             }
-            ASE_1 aseCommunication = new ASE_1(new BigInteger(R1KC.substring(9,R1KC.length())));
+            ASE aseCommunication = new ASE(new BigInteger(R1KC.substring(9,R1KC.length())));
             String msg2Send = aseCommunication.Encrypt("TEST KC");
             oos.writeObject(msg2Send);
 

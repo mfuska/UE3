@@ -1,7 +1,7 @@
 package OtwayRees.Client;
 
 
-import OtwayRees.ASE_1;
+import OtwayRees.ASE;
 import OtwayRees.Message;
 
 import java.math.BigInteger;
@@ -24,7 +24,7 @@ public class Client {
     private static OtwayRees.myLogger logObj;
     private static Logger logger;
 
-    private static ASE_1 aseObj;
+    private static ASE aseObj;
     private static int msgID; // length == 3
 
 
@@ -57,7 +57,7 @@ public class Client {
         threadRead.start();
         try {
             threadRead.join();
-            aseObj = new ASE_1(userKey.get(clientName));
+            aseObj = new ASE(userKey.get(clientName));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
