@@ -8,7 +8,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Created on 14.05.15.
@@ -18,12 +17,10 @@ public class ClientAuthServerCommunicationThread extends Thread {
 
     private ResultAuthServerSetter setter;
     private Message msgObj;
-    private Logger logger;
     private Random rand;
 
-    public ClientAuthServerCommunicationThread(Logger logger, Message msgObj) {
+    public ClientAuthServerCommunicationThread(Message msgObj) {
         this.msgObj = msgObj;
-        this.logger = logger;
     }
     public void setResultSetter(ResultAuthServerSetter setter) {
         this.setter = setter;
@@ -31,7 +28,6 @@ public class ClientAuthServerCommunicationThread extends Thread {
 
     public void run() {
         try {
-            this.logger.info("try to open the Socket");
             Socket c_socket = new Socket("localhost", PORT);
 
             ObjectOutputStream oos = new ObjectOutputStream(c_socket.getOutputStream());

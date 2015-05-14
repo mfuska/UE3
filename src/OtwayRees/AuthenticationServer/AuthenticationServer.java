@@ -14,7 +14,6 @@ import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Created on 11.05.15.
@@ -29,8 +28,6 @@ public class AuthenticationServer {
     private static BigInteger d = new BigInteger("21172262217534495471634887981071702875246911135321114362317317444199135576485995743140321385629581035521041020009033673730175993165652071724493971521566433417948732104092921224004169207344571671972826213750004053876926187313885686082384541322254299348083084372694839923079324508122835525142420596732896535118642519815835001993210034528244334536074373100429795492028598092715711589418466101867296242292170945305793366528590678636818718652408259997920316753385801513058072696999364111145817720650173858777644355231643555690036235437807806822774270225704189404159224338741079240815655459826420463019295163812707560281273");
     private static BigInteger e = new BigInteger("65537");
 
-    private static myLogger logObj;
-    private static Logger logger;
 
     private static final int PORT = 50001;
     private static ServerSocket s_Socket;
@@ -39,17 +36,11 @@ public class AuthenticationServer {
 
     private static void init() {
         try {
-            logObj = myLogger.getInstance();
-            logger = logObj.getLogger();
-            logger.info("AUTH-SERVER: try to start AuthenticationServer");
-            logger.info("AUTH_SERVER: read db file -> " + keyFile);
             readFile file = new readFile(keyFile);
             db = file.generateDB();
-            logger.info("AUTH-SERVER: init DB finished");
             sha = new OtwayRees.SHA256();
             rsa = new RSA(n,e);
             rsa.setPrivateKey(d);
-            logger.info("AUTH-SERVER: started AuthenticationServer");
         } catch (IOException e) {
             e.getStackTrace();
         }
@@ -63,7 +54,7 @@ public class AuthenticationServer {
             while (true) {
                 Socket s_incoming = s_Socket.accept();
 
-                Runnable r = new AuthServerThread(s_incoming, logger, sha, rsa,db);
+                Runnable r = new AuthServerThread(s_incoming, sha, rsa,db);
                 Thread t = new Thread(r);
                 t.setName("AuthServerThread");
                 t.start();
@@ -86,28 +77,24 @@ class AuthServerThread implements Runnable {
     private ObjectOutputStream oos;
 
     private static int BITLENGTH = 2048;
-    private Logger logger;
     private HashMap<String, BigInteger> db;
     private OtwayRees.SHA256 sha;
     private RSA rsa;
     private Random rand;
 
 
-    public AuthServerThread(Socket s, Logger logger, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> db) {
+    public AuthServerThread(Socket s, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> db) {
         this.socket = s;
         this.rsa = rsa;
-        this.logger = logger;
         this.sha = sha;
         this.db = db;
         this.rand = new Random();
     }
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        logger.info("returnPrivatKey");
         return this.db.get(this.sha.hex2String(this.sha.calculateHash(key)));
     }
     public void run() {
-        logger.info("run");
         try {
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());

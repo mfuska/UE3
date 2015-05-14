@@ -11,22 +11,17 @@ import java.util.logging.Logger;
 public class ClientReadInputThread extends Thread {
 
     private ResultSetter setter;
-    private Logger logger;
-    public ClientReadInputThread(Logger logger) {
-        this.logger = logger;
+    public ClientReadInputThread() {
     }
     public void setResultSetter(ResultSetter setter) {
         this.setter = setter;
     }
     public void run() {
-        logger.info(this.getName());
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         System.out.print("Enter your name:");
         try {
-            logger.info("read name");
             String name = br.readLine();
 
-            logger.info("read command");
             System.out.println("\tStart Chat = 1");
             System.out.println("\tWait for Chat = 2");
             System.out.print("Commands:");
@@ -38,7 +33,6 @@ public class ClientReadInputThread extends Thread {
             } else {
                 setter.setResult(name);
             }
-            logger.info(this.getName() + "run done");
         } catch (IOException e) {
             e.printStackTrace();
         }

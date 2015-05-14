@@ -19,7 +19,6 @@ public class ClientListenCommunicationThread extends Thread {
     private ServerSocket s_Socket;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private Logger logger;
     private ASE aseObj;
     private static int MAX = 99999999;
     private static int MIN = 10000000;
@@ -27,9 +26,8 @@ public class ClientListenCommunicationThread extends Thread {
     private Random rand;
     private Message authMessage;
 
-    public ClientListenCommunicationThread(Logger logger, ASE aseObj, int port) {
+    public ClientListenCommunicationThread(ASE aseObj, int port) {
         this.port = port;
-        this.logger = logger;
         this.aseObj = aseObj;
 
         this.rand = new Random();
@@ -43,7 +41,7 @@ public class ClientListenCommunicationThread extends Thread {
             }
         };
 
-        ClientAuthServerCommunicationThread threadAuth = new ClientAuthServerCommunicationThread(logger, messageObj);
+        ClientAuthServerCommunicationThread threadAuth = new ClientAuthServerCommunicationThread(messageObj);
         threadAuth.setName("ClientAuthServerCommunicationThread");
 
         threadAuth.setResultSetter(setter);
@@ -56,16 +54,13 @@ public class ClientListenCommunicationThread extends Thread {
     }
     public void run() {
         try {
-            logger.info("try to open the Socket");
             this.s_Socket = new ServerSocket(this.port);
             Socket socket = this.s_Socket.accept();
 
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
 
-            System.out.println(this.getName() + " read:");
             Message msg_Input = (Message) this.ois.readObject();
-            System.out.println(this.getName() + "after read:");
 
             this.R2 =  this.rand.nextInt((MAX - MIN) + 1) + MIN;
             String msgID = String.valueOf(msg_Input.getMsgID());
@@ -105,7 +100,6 @@ public class ClientListenCommunicationThread extends Thread {
                 this.ois.close();
                 this.oos.close();
                 this.s_Socket.close();
-                logger.info("Socket is closed");
             } catch (IOException e) {
                 e.printStackTrace();
             }

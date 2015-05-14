@@ -21,21 +21,15 @@ public class Client {
 
     private static HashMap<String,Integer> userPort;
     private static HashMap<String,BigInteger> userKey;
-    private static myLogger logObj;
-    private static Logger logger;
 
     private static ASE aseObj;
     private static int msgID; // length == 3
 
 
     private static void init() {
-        logObj = myLogger.getInstance();
-        logger = logObj.getLogger();
         initUserConfig();
         initUserKeyConfig();
-        logger.info("CLIENT try to read username");
         readUserInput();
-        logger.info("CLIENT " + clientName + ": Try to start ASE init");
         msgID = 100;
     }
     private static void readUserInput() {
@@ -50,7 +44,7 @@ public class Client {
                 startCommunication = true;
             }
         };
-        ClientReadInputThread threadRead = new ClientReadInputThread(logger);
+        ClientReadInputThread threadRead = new ClientReadInputThread();
         threadRead.setName("ClientReadInputThread");
 
         threadRead.setResultSetter(setter);
@@ -63,7 +57,7 @@ public class Client {
         }
     }
     private static void startUserListenCommunicationSocket(int port) {
-         ClientListenCommunicationThread lcThread = new ClientListenCommunicationThread(logger, aseObj, port);
+         ClientListenCommunicationThread lcThread = new ClientListenCommunicationThread(aseObj, port);
          lcThread.setName("ClientListenCommunicationThread ");
          //lcThread.setDaemon(true);
          lcThread.start();
@@ -73,7 +67,7 @@ public class Client {
             throw new Exception("msgID to BIG");
         }
         Message msg = new Message(msgID, clientName, userNameB);
-        ClientConnectionCommunikationThread ccThread = new ClientConnectionCommunikationThread(logger, aseObj, port, msg, aseObj);
+        ClientConnectionCommunikationThread ccThread = new ClientConnectionCommunikationThread(aseObj, port, msg, aseObj);
         ccThread.setName("ClientConnectionCommunikationThread");
         //ccThread.setDaemon(true);
         ccThread.start();
@@ -94,18 +88,12 @@ public class Client {
     }
     private static void configure() throws Exception {
         if (NETZ_WERK_CONFIG) {
-            logger.info("CLIENT NETWORK KONFIG" + clientName + ": Client LISTEN Communication");
             startUserListenCommunicationSocket(userPort.get("port"));
-            logger.info("CLIENT NETWORK KONFIG" + clientName + ": Client Connection Communication");
             if (startCommunication) startUserConnectionCommunikationThread(userPort.get("port"));
         } else {
-            logger.info("CLIENT NETWORK KONFIG" + clientName + ": Client Connection Communication");
             if (startCommunication) {
-                System.out.println("bevor startUserConnectionCommunicationThread on:" + userPort.get(userNameB));
                 startUserConnectionCommunikationThread(userPort.get(userNameB));
             } else {
-                logger.info("CLIENT LOKAL KONFIG" + clientName + ": Client LISTEN Communication");
-                System.out.println("bevor startUserListenCommunication on:" + userPort.get(clientName));
                 startUserListenCommunicationSocket(userPort.get(clientName));
             }
         }

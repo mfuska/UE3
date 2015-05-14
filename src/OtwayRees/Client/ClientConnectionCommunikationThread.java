@@ -22,7 +22,6 @@ public class ClientConnectionCommunikationThread extends Thread {
 
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    private Logger logger;
     private ASE aseObj;
     private Message msg_write;
     private ASE ase;
@@ -32,9 +31,8 @@ public class ClientConnectionCommunikationThread extends Thread {
     private static int MAX = 99999999;
     private static int MIN = 10000000;
 
-    public ClientConnectionCommunikationThread(Logger logger, ASE aseObj, int port, Message msg, ASE ase) {
+    public ClientConnectionCommunikationThread(ASE aseObj, int port, Message msg, ASE ase) {
         this.port = port;
-        this.logger = logger;
         this.aseObj = aseObj;
         this.msg_write = msg;
         this.ase = ase;
@@ -43,7 +41,6 @@ public class ClientConnectionCommunikationThread extends Thread {
 
     public void run() {
         try {
-            logger.info("try to open the Socket");
             this.socket = new Socket("localhost", this.port);
 
             this.oos = new ObjectOutputStream(this.socket.getOutputStream());
@@ -83,7 +80,6 @@ public class ClientConnectionCommunikationThread extends Thread {
                 this.socket.close();
                 this.oos.close();
                 this.ois.close();
-                logger.info(this.getName() + ":Socket is closed");
             } catch (IOException e) {
                 e.printStackTrace();
             }
