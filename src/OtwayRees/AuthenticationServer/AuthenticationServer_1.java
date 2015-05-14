@@ -13,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -76,6 +77,7 @@ class AuthServerThread implements Runnable {
     private HashMap<String, BigInteger> db;
     private OtwayRees.SHA256 sha;
     private RSA rsa;
+    private Random rand;
 
     public AuthServerThread(Socket s, Logger logger, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> db) {
         this.socket = s;
@@ -83,6 +85,7 @@ class AuthServerThread implements Runnable {
         this.logger = logger;
         this.sha = sha;
         this.db = db;
+        this.rand = new Random();
     }
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -97,13 +100,17 @@ class AuthServerThread implements Runnable {
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
             Message msgObj = (Message)ois.readObject();
-            System.out.println("msgID" + msgObj.getMsgID() + " userA:" + msgObj.getUserNameA() + " userB:" + msgObj.getUserNameB());
 
             ASE_1 aseUserA = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
             ASE_1 aseUserB = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
 
-            System.out.println(aseUserA.Decrypt(msgObj.getKA()));
-            System.out.println(aseUserB.Decrypt(msgObj.getKB()));
+            Message msgSend = new Message(msgObj.getMsgID());
+            String KA = aseUserA.Decrypt(msgObj.getKA());
+            String KB = aseUserB.Decrypt(msgObj.getKB());
+            String R1 = KA.substring(0,8);
+            String R2 = KB.substring(0,8);
+
+            
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

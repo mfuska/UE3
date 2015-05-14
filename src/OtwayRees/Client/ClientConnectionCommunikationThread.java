@@ -34,7 +34,6 @@ public class ClientConnectionCommunikationThread extends Thread {
         this.aseObj = aseObj;
         this.msg_write = msg;
         this.ase = ase;
-
         this.rand = new Random();
     }
 
@@ -54,6 +53,7 @@ public class ClientConnectionCommunikationThread extends Thread {
             String str = new String(strR + msgID + msg_write.getUserNameA() + msg_write.getUserNameB());
             System.out.println(this.getName() + " write:" + str);
             this.msg_write.setkA(ase.Encrypt(str));
+            System.out.println("DecryptMSG:" + ase.Decrypt(this.msg_write.getKA()));
             System.out.println(this.getName() + " write:" + str + " kA:" + msg_write.getKA());
             oos.writeObject(msg_write);
             System.out.println(this.getName() + " after write:" + str);

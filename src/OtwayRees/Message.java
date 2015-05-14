@@ -15,6 +15,9 @@ public class Message implements Serializable {
     private String kB;
     private String kC;
 
+    public Message(int id) {
+        this.msgID = id;
+    }
     public Message(int id, String nameA, String nameB) {
         this.msgID = id;
         this.userNameA = nameA;

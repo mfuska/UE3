@@ -72,6 +72,7 @@ public class ClientListenCommunicationThread extends Thread {
 
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             msg_Input.setkB(aseObj.Encrypt(str));
+            System.out.println("DecryptMSG:" + aseObj.Decrypt(msg_Input.getKB()));
             System.out.println(this.getName() + "bevor write to Auth Server:" + str + " kA:" + msg_Input.getKA() + " kB:" + msg_Input.getKB());
             startAuthServerCommunication(msg_Input);
             //WRITE TO AUTH SERVER

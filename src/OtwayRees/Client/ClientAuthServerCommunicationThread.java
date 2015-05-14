@@ -7,6 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.logging.Logger;
 
 /**
@@ -18,6 +19,7 @@ public class ClientAuthServerCommunicationThread extends Thread {
     private ResultAuthServerSetter setter;
     private Message msgObj;
     private Logger logger;
+    private Random rand;
 
     public ClientAuthServerCommunicationThread(Logger logger, Message msgObj) {
         this.msgObj = msgObj;
