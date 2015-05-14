@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 /*
- * Created by mike on 03.05.15.
+ * Created on 03.05.15.
  */
 public class myLogger {
     private Logger logger = Logger.getLogger("OtwayRees");

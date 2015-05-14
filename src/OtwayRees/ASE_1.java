@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 
 /**
- * Created by mike on 10.05.15.
+ * Created on 10.05.15.
  */
 public class ASE_1 {
     private Cipher cipherSend;

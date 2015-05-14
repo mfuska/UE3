@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 /**
- * Created by mike on 03.05.15.
+ * Created on 03.05.15.
  */
 public class generateKeyDB {
     private static OtwayRees.SHA256 sha;

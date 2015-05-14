@@ -1,6 +1,7 @@
 package OtwayRees.AuthenticationServer;
+
 /*
- * Created by mike on 01.05.15.
+ * Created on 01.05.15.
  */
 
 import java.math.BigInteger;

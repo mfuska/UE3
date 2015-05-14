@@ -17,7 +17,7 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Created by mike on 11.05.15.
+ * Created on 11.05.15.
  */
 public class AuthenticationServer_1 {
 
@@ -33,6 +33,7 @@ public class AuthenticationServer_1 {
     private static Logger logger;
 
     private static final int PORT = 50001;
+    private static ServerSocket s_Socket;
 
     private static void init() {
         try {
@@ -54,7 +55,7 @@ public class AuthenticationServer_1 {
     public static void main(String[] args) {
         init();
         try {
-            ServerSocket s_Socket = new ServerSocket(PORT);
+            s_Socket = new ServerSocket(PORT);
 
             while (true) {
                 Socket s_incoming = s_Socket.accept();
@@ -66,18 +67,28 @@ public class AuthenticationServer_1 {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                s_Socket.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }
 
 class AuthServerThread implements Runnable {
     private Socket socket;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
 
+    private static int BITLENGTH = 2048;
     private Logger logger;
     private HashMap<String, BigInteger> db;
     private OtwayRees.SHA256 sha;
     private RSA rsa;
     private Random rand;
+
 
     public AuthServerThread(Socket s, Logger logger, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> db) {
         this.socket = s;
@@ -90,14 +101,13 @@ class AuthServerThread implements Runnable {
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
         logger.info("returnPrivatKey");
-
         return this.db.get(this.sha.hex2String(this.sha.calculateHash(key)));
     }
     public void run() {
         logger.info("run");
         try {
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            this.ois = new ObjectInputStream(socket.getInputStream());
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
 
             Message msgObj = (Message)ois.readObject();
 
@@ -105,12 +115,21 @@ class AuthServerThread implements Runnable {
             ASE_1 aseUserB = new ASE_1(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
 
             Message msgSend = new Message(msgObj.getMsgID());
+
             String KA = aseUserA.Decrypt(msgObj.getKA());
             String KB = aseUserB.Decrypt(msgObj.getKB());
-            String R1 = KA.substring(0,8);
-            String R2 = KB.substring(0,8);
+            String R1 = KA.substring(0, 8);
+            String R2 = KB.substring(0, 8);
 
-            
+            String KC = (new BigInteger(BITLENGTH, this.rand)).toString();
+            String R1KC = R1 + KC;
+            String R2KC = R2 + KC;
+            msgSend.setkA(aseUserA.Encrypt(R1KC));
+            msgSend.setkB(aseUserB.Encrypt(R2KC));
+            //TODO: Check bevor send --> getMsgID must be greater at the next round
+
+            oos.writeObject(msgSend);
+
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -119,6 +138,13 @@ class AuthServerThread implements Runnable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                this.ois.close();
+                this.oos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

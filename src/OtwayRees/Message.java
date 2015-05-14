@@ -3,7 +3,7 @@ package OtwayRees;
 import java.io.Serializable;
 
 /**
- * Created by mike on 11.05.15.
+ * Created on 11.05.15.
  */
 public class Message implements Serializable {
     private String userNameA;
@@ -13,7 +13,6 @@ public class Message implements Serializable {
 
     private String kA;
     private String kB;
-    private String kC;
 
     public Message(int id) {
         this.msgID = id;
@@ -38,9 +37,6 @@ public class Message implements Serializable {
     public String getKB() {
         return this.kB;
     }
-    public String getKC() {
-        return this.kC;
-    }
 
     public void setUserNameA(String name) {
         this.userNameA = name;
@@ -56,8 +52,5 @@ public class Message implements Serializable {
     }
     public void setkB(String value) {
         this.kB = value;
-    }
-    public void setkC(String value) {
-        this.kC = value;
     }
 }

@@ -1,7 +1,7 @@
 package OtwayRees.Client;
 
 /**
- * Created by mike on 10.05.15.
+ * Created on 10.05.15.
  */
 public interface ResultSetter {
     void setResult(String name);

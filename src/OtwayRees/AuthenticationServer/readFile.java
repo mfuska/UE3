@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 
 /**
- * Created by mike on 03.05.15.
+ * Created on 03.05.15.
  */
 
 public class readFile {

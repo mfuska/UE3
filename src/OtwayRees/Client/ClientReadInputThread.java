@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 /**
- * Created by mike on 10.05.15.
+ * Created on 10.05.15.
  */
 public class ClientReadInputThread extends Thread {
 

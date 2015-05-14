@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 /**
- * Created by mike on 10.05.15.
+ * Created on 10.05.15.
  */
 public class Client {
 
@@ -107,13 +107,14 @@ public class Client {
             logger.info("CLIENT NETWORK KONFIG" + clientName + ": Client Connection Communication");
             if (startCommunication) startUserConnectionCommunikationThread(userPort.get("port"));
         } else {
-            logger.info("CLIENT LOKAL KONFIG" + clientName + ": Client LISTEN Communication");
-            System.out.println("bevor startUserListenCommunication on:" + userPort.get(clientName));
-            startUserListenCommunicationSocket(userPort.get(clientName));
             logger.info("CLIENT NETWORK KONFIG" + clientName + ": Client Connection Communication");
             if (startCommunication) {
                 System.out.println("bevor startUserConnectionCommunicationThread on:" + userPort.get(userNameB));
                 startUserConnectionCommunikationThread(userPort.get(userNameB));
+            } else {
+                logger.info("CLIENT LOKAL KONFIG" + clientName + ": Client LISTEN Communication");
+                System.out.println("bevor startUserListenCommunication on:" + userPort.get(clientName));
+                startUserListenCommunicationSocket(userPort.get(clientName));
             }
         }
 

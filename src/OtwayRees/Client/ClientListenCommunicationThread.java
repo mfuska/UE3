@@ -4,18 +4,21 @@ import OtwayRees.ASE_1;
 import OtwayRees.Message;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 import java.util.logging.Logger;
 
 /**
- * Created by mike on 10.05.15.
+ * Created on 10.05.15.
  */
 public class ClientListenCommunicationThread extends Thread {
     private int port;
 
-    private Socket socket;
+    private ServerSocket s_Socket;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
     private Logger logger;
     private OtwayRees.ASE_1 aseObj;
     private static int MAX = 99999999;
@@ -54,37 +57,65 @@ public class ClientListenCommunicationThread extends Thread {
     public void run() {
         try {
             logger.info("try to open the Socket");
-            ServerSocket s_Socket = new ServerSocket(this.port);
-            Socket socket = s_Socket.accept();
+            this.s_Socket = new ServerSocket(this.port);
+            Socket socket = this.s_Socket.accept();
 
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            this.ois = new ObjectInputStream(socket.getInputStream());
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
 
             System.out.println(this.getName() + " read:");
-            Message msg_Input = (Message) ois.readObject();
+            Message msg_Input = (Message) this.ois.readObject();
             System.out.println(this.getName() + "after read:");
 
-            String strR2 = String.valueOf(this.R2);
-            String msgID = String.valueOf(msg_Input.getMsgID());
-
             this.R2 =  this.rand.nextInt((MAX - MIN) + 1) + MIN;
-            String str = new String(strR2 + msgID + msg_Input.getUserNameA() + msg_Input.getUserNameB());
+            String msgID = String.valueOf(msg_Input.getMsgID());
+            String strR2 = Integer.toString(this.R2);
+
+            String str = strR2 + msgID + msg_Input.getUserNameA() + msg_Input.getUserNameB();
+            System.out.println("R2:" + R2 + " strR2:" + strR2);
+            System.out.println("str:" + str);
 
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             msg_Input.setkB(aseObj.Encrypt(str));
             System.out.println("DecryptMSG:" + aseObj.Decrypt(msg_Input.getKB()));
-            System.out.println(this.getName() + "bevor write to Auth Server:" + str + " kA:" + msg_Input.getKA() + " kB:" + msg_Input.getKB());
+            System.out.println(this.getName() + "before write to Auth Server");
             startAuthServerCommunication(msg_Input);
-            //WRITE TO AUTH SERVER
-            //oos.writeObject(msg_Input);
+            System.out.println(this.getName() + "after write to Auth Server msgID:" + authMessage.getMsgID() + " kA:" + authMessage.getKA() + " kB:" + authMessage.getKB());
+            //CHECK msgID == auth.msgID
+            if (msg_Input.getMsgID() != authMessage.getMsgID()) {
+                throw new Exception("msgID ERROR: msg_Input.getMsgID() != authMessage.getMsgID() ");
+            }
+            String R2KC =  aseObj.Decrypt(authMessage.getKB());
+            String R2_auth = R2KC.substring(0, 8);
+            BigInteger KC = new BigInteger(R2KC.substring(9,R2KC.length()));
+            //CHECK R2 == auth.R2
+            if (!strR2.equals(R2_auth)) {
+                throw new Exception("R2 ERROR: R2 != R2_auth ");
+            }
+            Message msg_Auth = new Message(authMessage.getMsgID());
+            msg_Auth.setkA(authMessage.getKA());
+            oos.writeObject(msg_Auth);
 
+            String msgReceived = (String) ois.readObject();
+            ASE_1 aseCommunication = new ASE_1(new BigInteger(R2KC.substring(9,R2KC.length())));
+            System.out.println(aseCommunication.Decrypt(msgReceived));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                this.ois.close();
+                this.oos.close();
+                this.s_Socket.close();
+                logger.info("Socket is closed");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
-        logger.info("Socket is closed");
-        System.out.println("run CLIENT THREAD");
     }
 }
 
