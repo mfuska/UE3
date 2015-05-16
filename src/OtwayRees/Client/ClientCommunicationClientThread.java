@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  * Created on 14.05.15.
  */
 
-public class ClientConnectionCommunikationThread extends Thread {
+public class ClientCommunicationClientThread extends Thread {
 
     private Socket socket;
     private int port;
@@ -31,7 +31,7 @@ public class ClientConnectionCommunikationThread extends Thread {
     private static int MAX = 99999999;
     private static int MIN = 10000000;
 
-    public ClientConnectionCommunikationThread(ASE aseObj, int port, Message msg, ASE ase) {
+    public ClientCommunicationClientThread(ASE aseObj, int port, Message msg, ASE ase) {
         this.port = port;
         this.aseObj = aseObj;
         this.msg_write = msg;
@@ -51,7 +51,11 @@ public class ClientConnectionCommunikationThread extends Thread {
             String msgID = String.valueOf(msg_write.getMsgID());
 
             // C P1 P2 K1{R1 C P1 P2}
-            String str = strR1 + msgID + msg_write.getUserNameA() + msg_write.getUserNameB();
+            String userPaddingA = String.format("%-10s", msg_write.getUserNameA());
+            String userPaddingB = String.format("%-10s", msg_write.getUserNameB());
+            String str = strR1 + msgID + userPaddingA + userPaddingB;
+
+            System.out.println(str);
             this.msg_write.setkA(ase.Encrypt(str));
             this.oos.writeObject(msg_write);
 

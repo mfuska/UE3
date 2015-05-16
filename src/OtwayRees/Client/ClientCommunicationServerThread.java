@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * Created on 10.05.15.
  */
-public class ClientListenCommunicationThread extends Thread {
+public class ClientCommunicationServerThread extends Thread {
     private int port;
 
     private ServerSocket s_Socket;
@@ -26,7 +26,7 @@ public class ClientListenCommunicationThread extends Thread {
     private Random rand;
     private Message authMessage;
 
-    public ClientListenCommunicationThread(ASE aseObj, int port) {
+    public ClientCommunicationServerThread(ASE aseObj, int port) {
         this.port = port;
         this.aseObj = aseObj;
 
@@ -66,10 +66,13 @@ public class ClientListenCommunicationThread extends Thread {
             String msgID = String.valueOf(msg_Input.getMsgID());
             String strR2 = Integer.toString(this.R2);
 
-            String str = strR2 + msgID + msg_Input.getUserNameA() + msg_Input.getUserNameB();
+            String userPaddingA = String.format("%-10s", msg_Input.getUserNameA());
+            String userPaddingB = String.format("%-10s", msg_Input.getUserNameB());
+            String str = strR2 + msgID + userPaddingA + userPaddingB;
 
-            // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
+            System.out.println(str);
             msg_Input.setkB(aseObj.Encrypt(str));
+            // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             startAuthServerCommunication(msg_Input);
             //CHECK msgID == auth.msgID
             if (msg_Input.getMsgID() != authMessage.getMsgID()) {

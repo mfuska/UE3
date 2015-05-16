@@ -115,17 +115,35 @@ class AuthServerThread implements Runnable {
             Message msgSend = new Message(msgObj.getMsgID());
 
             System.out.println(this.getClass().getName() + ": UserA:" + msgObj.getUserNameA() + " UserB:" + msgObj.getUserNameB());
+
             String KA = aseUserA.Decrypt(msgObj.getKA());
-            String KB = aseUserB.Decrypt(msgObj.getKB());
             String R1 = KA.substring(0, 8);
+            String msgID_A = KA.substring(8, 11);
+            String userA_A = KA.substring(11, 21);
+            String userB_A = KA.substring(21, 31);
+
+            String KB = aseUserB.Decrypt(msgObj.getKB());
             String R2 = KB.substring(0, 8);
+            String msgID_B = KB.substring(8, 11);
+            String userA_B = KB.substring(11, 21);
+            String userB_B = KB.substring(21, 31);
+
+            if (msgObj.getMsgID() != Integer.valueOf(msgID_A) || !msgID_A.equals(msgID_B)) {
+                throw new Exception("msgID do not agree");
+            }
+            if (! msgObj.getUserNameA().equals(userA_A.trim()) || ! (userA_A.trim()).equals(userA_B.trim())) {
+                throw new Exception("user A do not agree");
+            }
+
+            if (! msgObj.getUserNameB().equals(userB_A.trim()) || ! (userB_A.trim()).equals(userB_B.trim())) {
+                throw new Exception("user B do not agree");
+            }
 
             String KC = (new BigInteger(BITLENGTH, this.rand)).toString();
             String R1KC = R1 + KC;
             String R2KC = R2 + KC;
             msgSend.setkA(aseUserA.Encrypt(R1KC));
             msgSend.setkB(aseUserB.Encrypt(R2KC));
-            //TODO: Check bevor send --> getMsgID must be greater at the next round
 
             System.out.println(this.getClass().getName() + ":sendMMessage back");
             oos.writeObject(msgSend);
@@ -138,6 +156,8 @@ class AuthServerThread implements Runnable {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 System.out.println(this.getClass().getName() + ": close()");
@@ -149,3 +169,9 @@ class AuthServerThread implements Runnable {
         }
     }
 }
+
+/*
+
+
+
+*/

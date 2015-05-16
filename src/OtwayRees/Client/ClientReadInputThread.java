@@ -1,5 +1,7 @@
 package OtwayRees.Client;
 
+import com.sun.deploy.util.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,7 +23,7 @@ public class ClientReadInputThread extends Thread {
         System.out.print("Enter your name:");
         try {
             String name = br.readLine();
-
+            System.out.println(name);
             System.out.println("\tStart Chat = 1");
             System.out.println("\tWait for Chat = 2");
             System.out.print("Commands:");

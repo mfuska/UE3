@@ -55,7 +55,7 @@ public class Client {
         }
     }
     private static void startUserListenCommunicationSocket(int port) {
-         ClientListenCommunicationThread lcThread = new ClientListenCommunicationThread(aseObj, port);
+         ClientCommunicationServerThread lcThread = new ClientCommunicationServerThread(aseObj, port);
          lcThread.setName("ClientListenCommunicationThread ");
          //lcThread.setDaemon(true);
          lcThread.start();
@@ -65,7 +65,7 @@ public class Client {
             throw new Exception("msgID to BIG");
         }
         Message msg = new Message(msgID, clientName, userNameB);
-        ClientConnectionCommunikationThread ccThread = new ClientConnectionCommunikationThread(aseObj, port, msg, aseObj);
+        ClientCommunicationClientThread ccThread = new ClientCommunicationClientThread(aseObj, port, msg, aseObj);
         ccThread.setName("ClientConnectionCommunikationThread");
         //ccThread.setDaemon(true);
         ccThread.start();
