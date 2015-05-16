@@ -1,11 +1,9 @@
 package OtwayRees.Client;
 
-import com.sun.deploy.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Logger;
 
 /**
  * Created on 10.05.15.
