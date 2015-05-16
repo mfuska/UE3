@@ -31,7 +31,12 @@ public class AuthenticationServer {
 
     private static final int PORT = 50001;
     private static ServerSocket s_Socket;
-
+    /*
+    * ---------------------------
+    * Konfigurationsparameter muss angepasst werden
+    * keyFile  path + dateiname
+    * ---------------------------
+     */
     private static final String keyFile = new String("/Users/mike/2sem/Kryptographische Protokolle/UE3/src/OtwayRees/AuthenticationServer/key.db");
 
     private static void init() {
@@ -48,8 +53,8 @@ public class AuthenticationServer {
     public static void main(String[] args) {
         init();
         try {
-            s_Socket = new ServerSocket(PORT);
             System.out.println("AUTH-SERVER: up and running");
+            s_Socket = new ServerSocket(PORT);
 
             while (true) {
                 Socket s_incoming = s_Socket.accept();
@@ -63,6 +68,7 @@ public class AuthenticationServer {
             e.printStackTrace();
         } finally {
             try {
+                System.out.println("AUTH-SERVER: closed");
                 s_Socket.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -96,6 +102,8 @@ class AuthServerThread implements Runnable {
     }
     public void run() {
         try {
+            System.out.println(this.getClass().getName() + ": getMMessage");
+
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
 
@@ -106,6 +114,7 @@ class AuthServerThread implements Runnable {
 
             Message msgSend = new Message(msgObj.getMsgID());
 
+            System.out.println(this.getClass().getName() + ": UserA:" + msgObj.getUserNameA() + " UserB:" + msgObj.getUserNameB());
             String KA = aseUserA.Decrypt(msgObj.getKA());
             String KB = aseUserB.Decrypt(msgObj.getKB());
             String R1 = KA.substring(0, 8);
@@ -118,6 +127,7 @@ class AuthServerThread implements Runnable {
             msgSend.setkB(aseUserB.Encrypt(R2KC));
             //TODO: Check bevor send --> getMsgID must be greater at the next round
 
+            System.out.println(this.getClass().getName() + ":sendMMessage back");
             oos.writeObject(msgSend);
 
         } catch (UnsupportedEncodingException e) {
@@ -130,6 +140,7 @@ class AuthServerThread implements Runnable {
             e.printStackTrace();
         } finally {
             try {
+                System.out.println(this.getClass().getName() + ": close()");
                 this.ois.close();
                 this.oos.close();
             } catch (IOException e) {

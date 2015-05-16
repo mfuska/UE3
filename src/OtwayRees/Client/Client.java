@@ -39,7 +39,6 @@ public class Client {
             public void setResult(String nameA, String nameB) {
                 clientName = nameA;
                 userNameB = nameB;
-                System.out.println("nameA:" + clientName + " nameB:" + userNameB);
                 startCommunication = true;
             }
         };
@@ -88,7 +87,11 @@ public class Client {
     private static void configure() throws Exception {
         if (NETZ_WERK_CONFIG) {
             startUserListenCommunicationSocket(userPort.get("port"));
-            if (startCommunication) startUserConnectionCommunikationThread(userPort.get("port"));
+            if (startCommunication) {
+                startUserConnectionCommunikationThread(userPort.get("port"));
+            } else {
+                startUserListenCommunicationSocket(userPort.get("port"));
+            }
         } else {
             if (startCommunication) {
                 startUserConnectionCommunikationThread(userPort.get(userNameB));
@@ -96,7 +99,6 @@ public class Client {
                 startUserListenCommunicationSocket(userPort.get(clientName));
             }
         }
-
     }
     public static void main(String[] args) {
         try {
