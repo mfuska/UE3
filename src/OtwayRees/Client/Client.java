@@ -56,7 +56,7 @@ public class Client {
     }
     private static void startUserListenCommunicationSocket(int port) {
          ClientCommunicationServerThread lcThread = new ClientCommunicationServerThread(aseObj, port);
-         lcThread.setName("ClientListenCommunicationThread ");
+         lcThread.setName("ClientCommunicationServerThread ");
          //lcThread.setDaemon(true);
          lcThread.start();
     }
@@ -66,7 +66,7 @@ public class Client {
         }
         Message msg = new Message(msgID, clientName, userNameB);
         ClientCommunicationClientThread ccThread = new ClientCommunicationClientThread(aseObj, port, msg, aseObj);
-        ccThread.setName("ClientConnectionCommunikationThread");
+        ccThread.setName("ClientConnectionClientThread");
         //ccThread.setDaemon(true);
         ccThread.start();
         msgID++;

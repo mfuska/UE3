@@ -41,8 +41,9 @@ public class ClientCommunicationClientThread extends Thread {
 
     public void run() {
         try {
+            System.out.println(this.getName() + " try to connect ....");
             this.socket = new Socket("localhost", this.port);
-
+            System.out.println(this.getName() + " connection established ....");
             this.oos = new ObjectOutputStream(this.socket.getOutputStream());
             this.ois = new ObjectInputStream(this.socket.getInputStream());
 
@@ -55,22 +56,22 @@ public class ClientCommunicationClientThread extends Thread {
             String userPaddingB = String.format("%-10s", msg_write.getUserNameB());
             String str = strR1 + msgID + userPaddingA + userPaddingB;
 
-            System.out.println(str);
             this.msg_write.setkA(ase.Encrypt(str));
             this.oos.writeObject(msg_write);
 
             Message authMessage = (Message) ois.readObject();
             if (this.msg_write.getMsgID() != authMessage.getMsgID()) {
-                throw new Exception("msgID ERROR: msg_write.getMsgID() != authMessage.getMsgID() ");
+                throw new RuntimeException("msgID ERROR: msg_write.getMsgID() != authMessage.getMsgID() ");
             }
             String R1KC =  aseObj.Decrypt(authMessage.getKA());
             String R1_auth = R1KC.substring(0, 8);
             //CHECK R2 == auth.R2
             if (!strR1.equals(R1_auth)) {
-                throw new Exception("R1 ERROR: R1 != R1_auth ");
+                throw new RuntimeException("R1 ERROR: R1 != R1_auth ");
             }
             ASE aseCommunication = new ASE(new BigInteger(R1KC.substring(9,R1KC.length())));
-            String msg2Send = aseCommunication.Encrypt("TEST KC");
+            String msg2Send = aseCommunication.Encrypt(msg_write.getUserNameA() + " send his first message");
+            System.out.println(this.getName() + "Encrypt: " + msg_write.getUserNameA() + " send his first message");
             oos.writeObject(msg2Send);
 
         } catch (IOException e) {

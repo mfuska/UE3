@@ -12,14 +12,14 @@ import java.util.Random;
 /**
  * Created on 14.05.15.
  */
-public class ClientAuthServerCommunicationThread extends Thread {
+public class ClientCommunicationAuthServerThread extends Thread {
     private final static int PORT = 50001;
 
     private ResultAuthServerSetter setter;
     private Message msgObj;
     private Random rand;
 
-    public ClientAuthServerCommunicationThread(Message msgObj) {
+    public ClientCommunicationAuthServerThread(Message msgObj) {
         this.msgObj = msgObj;
     }
     public void setResultSetter(ResultAuthServerSetter setter) {
@@ -35,7 +35,6 @@ public class ClientAuthServerCommunicationThread extends Thread {
 
 
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
-            System.out.println(this.getName() + " write MessageObj to Auth Server");
             oos.writeObject(msgObj);
 
             Message msgObj_read = (Message) ois.readObject();

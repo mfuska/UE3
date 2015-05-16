@@ -8,7 +8,6 @@ import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Created on 10.05.15.
@@ -41,8 +40,8 @@ public class ClientCommunicationServerThread extends Thread {
             }
         };
 
-        ClientAuthServerCommunicationThread threadAuth = new ClientAuthServerCommunicationThread(messageObj);
-        threadAuth.setName("ClientAuthServerCommunicationThread");
+        ClientCommunicationAuthServerThread threadAuth = new ClientCommunicationAuthServerThread(messageObj);
+        threadAuth.setName("ClientCommunicationAuthServerThread");
 
         threadAuth.setResultSetter(setter);
         threadAuth.start();
@@ -54,8 +53,10 @@ public class ClientCommunicationServerThread extends Thread {
     }
     public void run() {
         try {
+            System.out.println(this.getName() + " is listening");
             this.s_Socket = new ServerSocket(this.port);
             Socket socket = this.s_Socket.accept();
+            System.out.println(this.getName() + " new connection is established");
 
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -70,20 +71,19 @@ public class ClientCommunicationServerThread extends Thread {
             String userPaddingB = String.format("%-10s", msg_Input.getUserNameB());
             String str = strR2 + msgID + userPaddingA + userPaddingB;
 
-            System.out.println(str);
             msg_Input.setkB(aseObj.Encrypt(str));
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             startAuthServerCommunication(msg_Input);
             //CHECK msgID == auth.msgID
             if (msg_Input.getMsgID() != authMessage.getMsgID()) {
-                throw new Exception("msgID ERROR: msg_Input.getMsgID() != authMessage.getMsgID() ");
+                throw new RuntimeException("msgID ERROR: msg_Input.getMsgID() != authMessage.getMsgID() ");
             }
             String R2KC =  aseObj.Decrypt(authMessage.getKB());
             String R2_auth = R2KC.substring(0, 8);
-            BigInteger KC = new BigInteger(R2KC.substring(9,R2KC.length()));
+
             //CHECK R2 == auth.R2
             if (!strR2.equals(R2_auth)) {
-                throw new Exception("R2 ERROR: R2 != R2_auth ");
+                throw new RuntimeException("R2 ERROR: R2 != R2_auth ");
             }
             Message msg_Auth = new Message(authMessage.getMsgID());
             msg_Auth.setkA(authMessage.getKA());
@@ -91,7 +91,7 @@ public class ClientCommunicationServerThread extends Thread {
 
             String msgReceived = (String) ois.readObject();
             ASE aseCommunication = new ASE(new BigInteger(R2KC.substring(9,R2KC.length())));
-            System.out.println("Decrypt message:" + aseCommunication.Decrypt(msgReceived));
+            System.out.println(this.getName() + "Decrypt: " + aseCommunication.Decrypt(msgReceived));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

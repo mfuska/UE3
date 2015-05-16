@@ -20,7 +20,8 @@ import java.util.Random;
  */
 public class AuthenticationServer {
 
-    private static HashMap<String, BigInteger> db;
+    private static HashMap<String, BigInteger> key_db;
+    private static HashMap<String, Integer> msgID_db;
     private static SHA256 sha;
     private static RSA rsa;
 
@@ -42,7 +43,8 @@ public class AuthenticationServer {
     private static void init() {
         try {
             readFile file = new readFile(keyFile);
-            db = file.generateDB();
+            key_db = file.generateDB();
+            msgID_db = new HashMap<String, Integer>();
             sha = new OtwayRees.SHA256();
             rsa = new RSA(n,e);
             rsa.setPrivateKey(d);
@@ -59,7 +61,7 @@ public class AuthenticationServer {
             while (true) {
                 Socket s_incoming = s_Socket.accept();
 
-                Runnable r = new AuthServerThread(s_incoming, sha, rsa,db);
+                Runnable r = new AuthServerThread(s_incoming, sha, rsa,key_db, msgID_db);
                 Thread t = new Thread(r);
                 t.setName("AuthServerThread");
                 t.start();
@@ -83,35 +85,47 @@ class AuthServerThread implements Runnable {
     private ObjectOutputStream oos;
 
     private static int BITLENGTH = 2048;
-    private HashMap<String, BigInteger> db;
+    private HashMap<String, BigInteger> keydb;
+    private HashMap<String, Integer> msgIDdb;
     private OtwayRees.SHA256 sha;
     private RSA rsa;
     private Random rand;
 
 
-    public AuthServerThread(Socket s, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> db) {
+    public AuthServerThread(Socket s, OtwayRees.SHA256 sha, RSA rsa, HashMap<String, BigInteger> keydb, HashMap<String,Integer> msgIDdb) {
         this.socket = s;
         this.rsa = rsa;
         this.sha = sha;
-        this.db = db;
+        this.keydb = keydb;
+        this.msgIDdb = msgIDdb;
         this.rand = new Random();
     }
 
     protected BigInteger retunPrivateKey(String key) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        return this.db.get(this.sha.hex2String(this.sha.calculateHash(key)));
+        return this.keydb.get(this.sha.hex2String(this.sha.calculateHash(key)));
+    }
+    protected void check_ReplacementAttack(Message msgObj) throws Exception {
+        if (msgIDdb.isEmpty()) {
+            msgIDdb.put(msgObj.getUserNameA(), msgObj.getMsgID());
+        } else if (! msgIDdb.containsKey(msgObj.getUserNameA())) {
+            msgIDdb.put(msgObj.getUserNameA(), msgObj.getMsgID());
+        } else {
+            if (msgObj.getMsgID() <= msgIDdb.get(msgObj.getMsgID() )) {
+                throw new RuntimeException("Replacement attack ;-)");
+            }
+        }
     }
     public void run() {
         try {
             System.out.println(this.getClass().getName() + ": getMMessage");
-
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
-
             Message msgObj = (Message)ois.readObject();
+
+            check_ReplacementAttack(msgObj);
 
             ASE aseUserA = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
             ASE aseUserB = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
-
             Message msgSend = new Message(msgObj.getMsgID());
 
             System.out.println(this.getClass().getName() + ": UserA:" + msgObj.getUserNameA() + " UserB:" + msgObj.getUserNameB());
@@ -129,14 +143,14 @@ class AuthServerThread implements Runnable {
             String userB_B = KB.substring(21, 31);
 
             if (msgObj.getMsgID() != Integer.valueOf(msgID_A) || !msgID_A.equals(msgID_B)) {
-                throw new Exception("msgID do not agree");
+                throw new RuntimeException("msgID do not agree");
             }
             if (! msgObj.getUserNameA().equals(userA_A.trim()) || ! (userA_A.trim()).equals(userA_B.trim())) {
-                throw new Exception("user A do not agree");
+                throw new RuntimeException("user A do not agree");
             }
 
             if (! msgObj.getUserNameB().equals(userB_A.trim()) || ! (userB_A.trim()).equals(userB_B.trim())) {
-                throw new Exception("user B do not agree");
+                throw new RuntimeException("user B do not agree");
             }
 
             String KC = (new BigInteger(BITLENGTH, this.rand)).toString();
@@ -145,7 +159,7 @@ class AuthServerThread implements Runnable {
             msgSend.setkA(aseUserA.Encrypt(R1KC));
             msgSend.setkB(aseUserB.Encrypt(R2KC));
 
-            System.out.println(this.getClass().getName() + ":sendMMessage back");
+            System.out.println(this.getClass().getName() + ": sendMMessage back");
             oos.writeObject(msgSend);
 
         } catch (UnsupportedEncodingException e) {
@@ -169,9 +183,3 @@ class AuthServerThread implements Runnable {
         }
     }
 }
-
-/*
-
-
-
-*/

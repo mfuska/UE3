@@ -23,12 +23,11 @@ public class ClientReadInputThread extends Thread {
         System.out.print("Enter your name:");
         try {
             String name = br.readLine();
-            System.out.println(name);
-            System.out.println("\tStart Chat = 1");
-            System.out.println("\tWait for Chat = 2");
-            System.out.print("Commands:");
+            System.out.println("\tStart Communication Server for User(" + name + ") : 1");
+            System.out.println("\tStart Communication Client for User(" + name + ") : 2");
+            System.out.print("Usage: [ 1 | 2 ]:");
             String cmd = br.readLine();
-            if (cmd.equals("1")) {
+            if (cmd.equals("2")) {
                 System.out.print("\tEnter the name of your Chat partner:");
                 String nameB = br.readLine();
                 setter.setResult(name,nameB);
