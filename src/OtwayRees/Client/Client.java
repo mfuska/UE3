@@ -6,7 +6,6 @@ import OtwayRees.Message;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * Created on 10.05.15.
