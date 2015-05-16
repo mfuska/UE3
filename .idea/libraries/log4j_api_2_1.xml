@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="US_export_policy">
+  <library name="log4j-api-2.1">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/US_export_policy.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/log4j-api-2.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -1,0 +1,80 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Appenders>
+        <File name="file" fileName="myapp.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m %ex%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d [%r %t] %-5p %c - %m%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="file" level="DEBUG"/>
+            <AppenderRef ref="STDOUT" level="INFO"/>
+        </Root>
+    </Loggers>
+</Configuration>
+
+
+        <?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="30" status="debug">
+<!-- monitorInterval: automatic reload every 30sec on changes -->
+<!-- status: log4j2 internal logging (not for the app) -->
+
+<!-- fantastic: properties within config-file finally in log4j2 <img src="http://christoph-burmeister.eu/wp-includes/images/smilies/icon_smile.gif" alt=":-)" class="wp-smiley"> -->
+<Properties>
+    <Property name="filename-server1-all">logs/server1-all.log</Property>
+    <Property name="filename-server1-error">logs/server1-err.log</Property>
+    <Property name="filename-server2-all">logs/server2-all.log</Property>
+    <Property name="filename-server2-error">logs/server2-err.log</Property>
+</Properties>
+
+<Appenders>
+    <!-- the standard-console-appender -->
+    <Console name="appender-Console-all" target="SYSTEM_OUT">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+    </Console>
+
+    <!-- the appenders for server 1 -->
+    <File name="appender-server-1-all" fileName="${filename-server1-all}" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+    </File>
+    <File name="appender-server-1-error" fileName="${filename-server1-error}" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+    </File>
+
+    <!-- the appenders for server 2 -->
+    <File name="appender-server-2-all" fileName="${filename-server2-all}" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+    </File>
+    <File name="appender-server-2-error" fileName="${filename-server2-error}" append="true">
+        <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+    </File>
+</Appenders>
+
+
+<Loggers>
+    <!-- Every configuration must have a root logger. If one is not configured the default root LoggerConfig is ERROR with Console appender attached. -->
+    <Root level="DEBUG">
+        <AppenderRef ref="appender-Console-all" />
+    </Root>
+
+    <!-- server1-loggers -->
+    <!-- additivity means, that parent-logger (in every case the root-logger) will also get the chance to log this stuff -->
+    <Logger name="org.jtaddeus.playground.loggenerator.Server1" additivity="TRUE" level="ALL">
+        <AppenderRef ref="appender-server-1-all" level="ALL" />
+        <AppenderRef ref="appender-server-1-error" level="ERROR" />
+    </Logger>
+
+    <!-- server2-loggers -->
+    <!-- additivity means, that parent-logger (in every case the root-logger) will also get the chance to log this stuff -->
+    <Logger name="org.jtaddeus.playground.loggenerator.Server2" additivity="TRUE" level="ALL">
+        <AppenderRef ref="appender-server-2-all" level="ALL" />
+        <AppenderRef ref="appender-server-2-error" level="ERROR" />
+    </Logger>
+</Loggers>
+</Configuration>
+
