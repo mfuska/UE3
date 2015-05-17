@@ -1,6 +1,6 @@
 package OtwayRees.AuthenticationServer;
 
-import OtwayRees.ASE;
+import OtwayRees.AES;
 import OtwayRees.Message;
 import OtwayRees.SHA256;
 
@@ -121,22 +121,23 @@ class AuthServerThread implements Runnable {
             this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
             Message msgObj = (Message)ois.readObject();
+            System.out.println(this.getClass().getName() + "Count receive Bytes: " + msgObj.sizeof());
 
             check_ReplacementAttack(msgObj);
 
-            ASE aseUserA = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
-            ASE aseUserB = new ASE(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
+            AES AESUserA = new AES(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameA())))) ;
+            AES AESUserB = new AES(new BigInteger(rsa.decrypt(retunPrivateKey(msgObj.getUserNameB())))) ;
             Message msgSend = new Message(msgObj.getMsgID());
 
             System.out.println(this.getClass().getName() + ": UserA:" + msgObj.getUserNameA() + " UserB:" + msgObj.getUserNameB());
 
-            String KA = aseUserA.Decrypt(msgObj.getKA());
+            String KA = AESUserA.Decrypt(msgObj.getKA());
             String R1 = KA.substring(0, 8);
             String msgID_A = KA.substring(8, 11);
             String userA_A = KA.substring(11, 21);
             String userB_A = KA.substring(21, 31);
 
-            String KB = aseUserB.Decrypt(msgObj.getKB());
+            String KB = AESUserB.Decrypt(msgObj.getKB());
             String R2 = KB.substring(0, 8);
             String msgID_B = KB.substring(8, 11);
             String userA_B = KB.substring(11, 21);
@@ -156,10 +157,11 @@ class AuthServerThread implements Runnable {
             String KC = (new BigInteger(BITLENGTH, this.rand)).toString();
             String R1KC = R1 + KC;
             String R2KC = R2 + KC;
-            msgSend.setkA(aseUserA.Encrypt(R1KC));
-            msgSend.setkB(aseUserB.Encrypt(R2KC));
+            msgSend.setkA(AESUserA.Encrypt(R1KC));
+            msgSend.setkB(AESUserB.Encrypt(R2KC));
 
             System.out.println(this.getClass().getName() + ": sendMMessage back");
+            System.out.println(this.getClass().getName() + "Count send Bytes: " + msgSend.sizeof());
             oos.writeObject(msgSend);
 
         } catch (UnsupportedEncodingException e) {
@@ -176,6 +178,7 @@ class AuthServerThread implements Runnable {
             try {
                 System.out.println(this.getClass().getName() + ": close()");
                 this.ois.close();
+                this.oos.flush();
                 this.oos.close();
             } catch (IOException e) {
                 e.printStackTrace();

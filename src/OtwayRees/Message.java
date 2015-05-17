@@ -1,5 +1,8 @@
 package OtwayRees;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -52,5 +55,18 @@ public class Message implements Serializable {
     }
     public void setkB(String value) {
         this.kB = value;
+    }
+    public int sizeof()  {
+        ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = null;
+        try {
+            objectOutputStream = new ObjectOutputStream(byteOutputStream);
+            objectOutputStream.writeObject(this);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return byteOutputStream.toByteArray().length;
     }
 }

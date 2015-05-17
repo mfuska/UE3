@@ -1,6 +1,6 @@
 package OtwayRees.Client;
 
-import OtwayRees.ASE;
+import OtwayRees.AES;
 import OtwayRees.Message;
 
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Random;
-import java.util.logging.Logger;
 
 /**
  * Created on 14.05.15.
@@ -22,25 +21,26 @@ public class ClientCommunicationClientThread extends Thread {
 
     private ObjectInputStream ois;
     private ObjectOutputStream oos;
-    private ASE aseObj;
+    private AES AESObj;
     private Message msg_write;
-    private ASE ase;
+    private AES AES;
     private int R1;
     private Random rand;
 
     private static int MAX = 99999999;
     private static int MIN = 10000000;
 
-    public ClientCommunicationClientThread(ASE aseObj, int port, Message msg, ASE ase) {
+    public ClientCommunicationClientThread(AES AESObj, int port, Message msg, AES AES) {
         this.port = port;
-        this.aseObj = aseObj;
+        this.AESObj = AESObj;
         this.msg_write = msg;
-        this.ase = ase;
+        this.AES = AES;
         this.rand = new Random();
     }
 
     public void run() {
         try {
+            long before = System.currentTimeMillis();
             System.out.println(this.getName() + " try to connect ....");
             this.socket = new Socket("localhost", this.port);
             System.out.println(this.getName() + " connection established ....");
@@ -56,21 +56,30 @@ public class ClientCommunicationClientThread extends Thread {
             String userPaddingB = String.format("%-10s", msg_write.getUserNameB());
             String str = strR1 + msgID + userPaddingA + userPaddingB;
 
-            this.msg_write.setkA(ase.Encrypt(str));
+            this.msg_write.setkA(AES.Encrypt(str));
+            //amount of send bytes
+            System.out.println(this.getClass().getName() + " Count send Bytes: " + this.msg_write.sizeof());
             this.oos.writeObject(msg_write);
 
             Message authMessage = (Message) ois.readObject();
+            //amount of received bytes
+            System.out.println(this.getClass().getName() + " Count receive Bytes: " + authMessage.sizeof());
             if (this.msg_write.getMsgID() != authMessage.getMsgID()) {
                 throw new RuntimeException("msgID ERROR: msg_write.getMsgID() != authMessage.getMsgID() ");
             }
-            String R1KC =  aseObj.Decrypt(authMessage.getKA());
+            String R1KC =  AESObj.Decrypt(authMessage.getKA());
             String R1_auth = R1KC.substring(0, 8);
             //CHECK R2 == auth.R2
             if (!strR1.equals(R1_auth)) {
                 throw new RuntimeException("R1 ERROR: R1 != R1_auth ");
             }
-            ASE aseCommunication = new ASE(new BigInteger(R1KC.substring(9,R1KC.length())));
-            String msg2Send = aseCommunication.Encrypt(msg_write.getUserNameA() + " send his first message");
+
+            // Count Runtime
+            long after = System.currentTimeMillis();
+            System.out.println(this.getClass().getName() + "--- Runtime: " + (after - before));
+            AES AESCommunication = new AES(new BigInteger(R1KC.substring(9,R1KC.length())));
+            // Send the first messages with KC
+            String msg2Send = AESCommunication.Encrypt(msg_write.getUserNameA() + " send his first message");
             System.out.println(this.getName() + "Encrypt: " + msg_write.getUserNameA() + " send his first message");
             oos.writeObject(msg2Send);
 

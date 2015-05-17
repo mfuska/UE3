@@ -1,7 +1,7 @@
 package OtwayRees.Client;
 
 
-import OtwayRees.ASE;
+import OtwayRees.AES;
 import OtwayRees.Message;
 
 import java.math.BigInteger;
@@ -21,7 +21,7 @@ public class Client {
     private static HashMap<String,Integer> userPort;
     private static HashMap<String,BigInteger> userKey;
 
-    private static ASE aseObj;
+    private static AES AESObj;
     private static int msgID; // length == 3
 
 
@@ -49,23 +49,23 @@ public class Client {
         threadRead.start();
         try {
             threadRead.join();
-            aseObj = new ASE(userKey.get(clientName));
+            AESObj = new AES(userKey.get(clientName));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
     private static void startUserListenCommunicationSocket(int port) {
-         ClientCommunicationServerThread lcThread = new ClientCommunicationServerThread(aseObj, port);
+         ClientCommunicationServerThread lcThread = new ClientCommunicationServerThread(AESObj, port);
          lcThread.setName("ClientCommunicationServerThread ");
          //lcThread.setDaemon(true);
          lcThread.start();
     }
     private static void startUserConnectionCommunikationThread(int port) throws Exception {
         if (msgID > 999) {
-            throw new Exception("msgID to BIG");
+            throw new RuntimeException("msgID to BIG");
         }
         Message msg = new Message(msgID, clientName, userNameB);
-        ClientCommunicationClientThread ccThread = new ClientCommunicationClientThread(aseObj, port, msg, aseObj);
+        ClientCommunicationClientThread ccThread = new ClientCommunicationClientThread(AESObj, port, msg, AESObj);
         ccThread.setName("ClientConnectionClientThread");
         //ccThread.setDaemon(true);
         ccThread.start();

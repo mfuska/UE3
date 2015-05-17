@@ -1,6 +1,6 @@
 package OtwayRees.Client;
 
-import OtwayRees.ASE;
+import OtwayRees.AES;
 import OtwayRees.Message;
 
 import java.io.*;
@@ -18,16 +18,16 @@ public class ClientCommunicationServerThread extends Thread {
     private ServerSocket s_Socket;
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
-    private ASE aseObj;
+    private AES AESObj;
     private static int MAX = 99999999;
     private static int MIN = 10000000;
     private int R2;
     private Random rand;
     private Message authMessage;
 
-    public ClientCommunicationServerThread(ASE aseObj, int port) {
+    public ClientCommunicationServerThread(AES AESObj, int port) {
         this.port = port;
-        this.aseObj = aseObj;
+        this.AESObj = AESObj;
 
         this.rand = new Random();
         this.R2 =  rand.nextInt((MAX - MIN) + 1) + MIN;
@@ -71,14 +71,14 @@ public class ClientCommunicationServerThread extends Thread {
             String userPaddingB = String.format("%-10s", msg_Input.getUserNameB());
             String str = strR2 + msgID + userPaddingA + userPaddingB;
 
-            msg_Input.setkB(aseObj.Encrypt(str));
+            msg_Input.setkB(AESObj.Encrypt(str));
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
             startAuthServerCommunication(msg_Input);
             //CHECK msgID == auth.msgID
             if (msg_Input.getMsgID() != authMessage.getMsgID()) {
                 throw new RuntimeException("msgID ERROR: msg_Input.getMsgID() != authMessage.getMsgID() ");
             }
-            String R2KC =  aseObj.Decrypt(authMessage.getKB());
+            String R2KC =  AESObj.Decrypt(authMessage.getKB());
             String R2_auth = R2KC.substring(0, 8);
 
             //CHECK R2 == auth.R2
@@ -90,8 +90,8 @@ public class ClientCommunicationServerThread extends Thread {
             oos.writeObject(msg_Auth);
 
             String msgReceived = (String) ois.readObject();
-            ASE aseCommunication = new ASE(new BigInteger(R2KC.substring(9,R2KC.length())));
-            System.out.println(this.getName() + "Decrypt: " + aseCommunication.Decrypt(msgReceived));
+            AES AESCommunication = new AES(new BigInteger(R2KC.substring(9,R2KC.length())));
+            System.out.println(this.getName() + "Decrypt: " + AESCommunication.Decrypt(msgReceived));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
