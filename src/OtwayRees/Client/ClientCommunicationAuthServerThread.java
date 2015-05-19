@@ -18,6 +18,9 @@ public class ClientCommunicationAuthServerThread extends Thread {
     private ResultAuthServerSetter setter;
     private Message msgObj;
     private Random rand;
+    private Socket c_socket;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
 
     public ClientCommunicationAuthServerThread(Message msgObj) {
         this.msgObj = msgObj;
@@ -28,10 +31,10 @@ public class ClientCommunicationAuthServerThread extends Thread {
 
     public void run() {
         try {
-            Socket c_socket = new Socket("localhost", PORT);
+            c_socket = new Socket("localhost", PORT);
 
-            ObjectOutputStream oos = new ObjectOutputStream(c_socket.getOutputStream());
-            ObjectInputStream ois = new ObjectInputStream(c_socket.getInputStream());
+            oos = new ObjectOutputStream(c_socket.getOutputStream());
+            ois = new ObjectInputStream(c_socket.getInputStream());
 
 
             // C P1 P2 K1{R1 C P1 P2} K2{R2 C P1 P2}
@@ -47,6 +50,15 @@ public class ClientCommunicationAuthServerThread extends Thread {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                oos.flush();
+                oos.close();
+                ois.close();
+                c_socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
