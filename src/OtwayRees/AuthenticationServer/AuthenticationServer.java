@@ -113,8 +113,10 @@ class AuthServerThread implements Runnable {
             if (msgObj.getMsgID() <= msgIDdb.get(msgObj.getMsgID() )) {
                 throw new RuntimeException("Replacement attack ;-)");
             }
+            msgIDdb.put(msgObj.getUserNameA(), msgObj.getMsgID());
         }
     }
+
     public void run() {
         try {
             System.out.println(this.getClass().getName() + ": getMMessage");
